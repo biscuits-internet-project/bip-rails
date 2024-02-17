@@ -1,0 +1,16 @@
+# Disable all cops by default
+AllCops:
+  DisabledByDefault: true
+
+# Enable only certain groups of cops
+Layout:
+  Enabled: true
+
+Style:
+  Enabled: true
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false

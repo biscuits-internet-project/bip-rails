@@ -1,0 +1,22 @@
+<h1>Songs</h1>
+
+<%= form_tag(songs_path, method: :get) do %>
+  <%= text_field_tag(:search, params[:search]) %>
+  <%= submit_tag ("Search") %>
+<% end %>
+
+<table>
+  <tr>
+    <th><%= sortable "title" %></th>
+    <th><%= sortable "times_played" %> </th>
+    <th><%= sortable "date_last_played" %> </th>
+  </tr>
+
+<% @songs.each do |song| %>
+<tr>
+    <td><%= link_to song.title, song_path(song.slug) %></td>
+    <td><%= song.times_played %></td>
+    <td><%= song.date_last_played %></td>
+</tr>
+<% end %>
+</table>
