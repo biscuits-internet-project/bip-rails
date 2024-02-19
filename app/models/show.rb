@@ -1,13 +1,13 @@
 class Show < ApplicationRecord
   include PgSearch::Model
-  multisearchable :against => [:venue_name, :venue_city, :venue_country, :dates_for_search,
-    :venue_state_name, :venue_state, :notes, :song_titles, :has_photos, :has_youtube, :has_relisten, :track_annotations, :has_reviews]
+  multisearchable against: %i[venue_name venue_city venue_country dates_for_search
+                              venue_state_name venue_state notes song_titles has_photos has_youtube has_relisten track_annotations has_reviews]
 
   extend FriendlyId
   include Likeable
   include Rateable
 
-  friendly_id :slug_candidates, use: [:sequentially_slugged, :finders]
+  friendly_id :slug_candidates, use: %i[sequentially_slugged finders]
 
   delegate :name, :city, :state, :state_name, :country, to: :venue, prefix: 'venue', allow_nil: true
 
@@ -23,7 +23,7 @@ class Show < ApplicationRecord
 
   def slug_candidates
     [
-      [:date_for_url, :venue_name, :venue_city, :venue_state]
+      %i[date_for_url venue_name venue_city venue_state]
     ]
   end
 
@@ -38,27 +38,27 @@ class Show < ApplicationRecord
   end
 
   def has_photos
-    return "photos" if show_photos.exists?
+    "photos" if show_photos.exists?
   end
 
   def has_youtube
-    return "youtube" if show_youtubes.exists?
+    "youtube" if show_youtubes.exists?
   end
 
   def has_relisten
-    return "relisten" if relisten_url.present?
+    "relisten" if relisten_url.present?
   end
 
   def has_reviews
-    return "reviews review" if reviews.exists?
+    "reviews review" if reviews.exists?
   end
 
   def dates_for_search
     date.strftime("%-m/%-d") + " " +
-    date.strftime("%-m/%-d/%Y") + " " +
-    date.strftime("%-m/%-d/%y") + " " +
-    date.strftime("%Y") + " " +
-    date.strftime("%B")
+      date.strftime("%-m/%-d/%Y") + " " +
+      date.strftime("%-m/%-d/%y") + " " +
+      date.strftime("%Y") + " " +
+      date.strftime("%B")
   end
 
   def track_annotations
@@ -77,7 +77,7 @@ class Show < ApplicationRecord
   end
 
   def shows_on_same_day
-    self.class.by_day_of_year(self.date.month, self.date.day).where.not(id: self.id).order(:date)
+    self.class.by_day_of_year(date.month, date.day).where.not(id:).order(:date)
   end
 
   def date_for_url
@@ -88,4 +88,3 @@ class Show < ApplicationRecord
     end
   end
 end
-

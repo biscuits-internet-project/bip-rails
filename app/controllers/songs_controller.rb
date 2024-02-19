@@ -1,7 +1,7 @@
 class SongsController < ApplicationController
   skip_before_action :authenticate_request, only: %i[index show]
   before_action :authorize_admin, only: %i[create update destroy]
-  before_action :set_song, only: %i[update destroy]
+  before_action :set_song, only: %i[show update destroy]
   helper_method :sort_column, :sort_direction
 
   # GET /songs
@@ -17,7 +17,6 @@ class SongsController < ApplicationController
 
   # GET /songs/1
   def show
-    @song = Song.find(params[:id])
     @song.generate_history_links
     @song
   end
@@ -55,12 +54,6 @@ class SongsController < ApplicationController
 
   def sort_direction
     %w[asc desc].include?(params[:direction]) ? params[:direction] : 'desc'
-  end
-
-  def search_songs
-    return unless @player = Player.all.find { |player| player.name.include?(params[:search]) }
-
-    redirect_to player_path(@player)
   end
 
   def set_song

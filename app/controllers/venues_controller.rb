@@ -1,21 +1,22 @@
 class VenuesController < ApplicationController
-  skip_before_action :authenticate_request, only: [:index, :show]
-  before_action :authorize_admin, only: [:create, :update, :destroy]
-  before_action :set_venue, only: [:show, :update, :destroy]
+  skip_before_action :authenticate_request, only: %i[index show]
+  before_action :authorize_admin, only: %i[create update destroy]
+  before_action :set_venue, only: %i[show update destroy]
 
-  # GET /venues
   def index
-    venues = Rails.cache.fetch('venues:all') do
-      v = Venue.order(:name).all.to_a
-      VenueSerializer.render(v)
-    end
+    @pagy, @venues = pagy(Venue.order(times_played: :desc))
 
-    render json: venues
+    # @venues = Rails.cache.fetch('venues:all') do
+    #   Venue.order(times_played: :desc)
+    # end
   end
 
   # GET /venues/1
   def show
-    render json: VenueSerializer.render(@venue, view: :details)
+    @venue
+    @shows = @venue.shows.includes(:venue, tracks: %i[annotations song]).merge(Track.setlist).sort do |a, b|
+      a.date <=> b.date
+    end
   end
 
   # POST /venues
@@ -44,11 +45,12 @@ class VenuesController < ApplicationController
   end
 
   private
-    def set_venue
-      @venue = Venue.find(params[:id])
-    end
 
-    def venue_params
-      params.permit(:name, :street, :city, :state, :country, :postal_code, :phone, :website)
-    end
+  def set_venue
+    @venue = Venue.find(params[:id])
+  end
+
+  def venue_params
+    params.permit(:name, :street, :city, :state, :country, :postal_code, :phone, :website)
+  end
 end

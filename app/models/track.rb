@@ -5,9 +5,9 @@ class Track < ApplicationRecord
 
   acts_as_taggable
 
-  friendly_id :slug_candidates, use: [:sequentially_slugged, :finders, :history]
+  friendly_id :slug_candidates, use: %i[sequentially_slugged finders history]
 
-  scope :setlist, -> { order("tracks.set in ('E1', 'E2'), tracks.set, tracks.position") }
+  scope :setlist, -> { order(Arel.sql("tracks.set in ('E1', 'E2'), tracks.set, tracks.position")) }
 
   belongs_to :song, touch: true
   belongs_to :show
@@ -52,16 +52,17 @@ class Track < ApplicationRecord
   end
 
   def update_show_previous_and_next_tracks
-    self.show.tracks.each do |track|
+    show.tracks.each do |track|
       track.update_previous_and_next_tracks
     end
   end
 
   def update_previous_and_next_tracks
-    previous_track_id = self.class.where(show_id: self.show_id, set: self.set, position: self.position.to_i - 1).limit(1).pluck(:id).first
-    next_track_id = self.class.where(show_id: self.show_id, set: self.set, position: self.position.to_i + 1).limit(1).pluck(:id).first
+    previous_track_id = self.class.where(show_id:, set:,
+                                         position: position.to_i - 1).limit(1).pluck(:id).first
+    next_track_id = self.class.where(show_id:, set:,
+                                     position: position.to_i + 1).limit(1).pluck(:id).first
 
-    self.update_columns(previous_track_id: previous_track_id, next_track_id: next_track_id)
+    update_columns(previous_track_id:, next_track_id:)
   end
-
 end

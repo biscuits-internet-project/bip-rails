@@ -1,0 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import "shadcn.css";
+@import "pagy.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  a {
+    @apply text-purple-800;
+  }
+  a:hover {
+    @apply text-blue-800 underline;
+  }
+  a:visited {
+    @apply text-purple-600;
+  }
+  h1 {
+    @apply text-5xl font-bold my-3;
+  }
+  .badge {
+    @apply inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10;
+  }
+}

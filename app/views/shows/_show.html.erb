@@ -1,0 +1,40 @@
+<div class="p-4">
+    <div class="flex justify-between">
+        <div>
+            <h2><%= link_to format_show_date(show.date), show_path(show.slug) %></h2>
+            <h2>
+                <%= link_to venue_path(show.venue.slug) do %>
+                    <%= show.venue.name %> - <%= show.venue.city %>, <%= show.venue.state %>
+                <% end %>
+            </h2>
+        </div>
+        <div>
+           <%= show.average_rating.round(2) %>
+        </div>
+
+    </div>
+
+  <div>
+    <%= show.notes %>
+  </div>
+
+  <div class="my-2">
+    <% sorted_tracks = show.tracks.sort_by { |track| ['S1', 'S2', 'S3', 'S4', 'E1', 'E2'].index(track.set) || SET_ORDER.size } %> 
+    <% annotations = sorted_tracks.map { |track| track.annotations.map(&:desc) }.uniq.flatten %>
+
+    <% sorted_tracks.group_by(&:set).each do |set, tracks| %>
+        <div>
+            <%= set %> 
+            <% tracks.each_with_index do |track, index| %>
+                <%= link_to track.song.title, song_path(track.song.slug) %><%= track_annotations(track, annotations) %><%= track_segue(track, index, tracks.length) %>
+            <% end %>
+        </div> 
+    <% end %>
+  </div>
+
+  <div>
+    <% annotations.each_with_index do |annotation, index| %>
+        <div class="italic text-sm"><%= index + 1 %> <%= annotation %></div>
+    <% end %>
+  </div>
+</div>

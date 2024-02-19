@@ -1,0 +1,38 @@
+
+<h1>Venues</h1>
+
+<%= form_tag(venues_path, method: :get) do %>
+  <%= text_field_tag(:search, params[:search]) %>
+  <%= render_button "Search" %>
+<% end %>
+
+<%= render_table do %>
+  <%= table_head do %>
+    <%= table_header "Name" %>
+    <%= table_header "City" %>
+    <%= table_header "State" %>
+    <%= table_header "Times played" %>
+  <% end %>
+  <%= table_body do %>
+    <% @venues.each do |venue| %>
+      <%= table_row do %>
+        <%= table_column do %>
+          <%= link_to venue.name, venue_path(venue.slug) %>
+        <% end %>
+        <%= table_column do %> 
+          <%= venue.city %>
+        <% end %>
+        <%= table_column do %> 
+          <%= venue.state %>
+        <% end %>
+        <%= table_column do %> 
+          <%= venue.times_played %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+
+<%== pagy_info(@pagy) %>

@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     get :tags, on: :collection
     resources :comments, shallow: true
   end
+
   resources :comments
   resources :tracks, except: [:create] do
     get :charts, on: :collection
@@ -17,9 +18,13 @@ Rails.application.routes.draw do
     post :favorite, on: :member
     post :unfavorite, on: :member
     get :photos, on: :member, to: 'show_photos#index'
-    get :user, on: :collection
     resources :reviews, only: %i[create index]
+    collection do
+      get 'year/:year', to: 'shows#index', as: "by_year"
+      get :user
+    end
   end
+
   resources :bands
   resources :venues
   resources :songs

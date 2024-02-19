@@ -1,66 +1,60 @@
 class ShowsController < ApplicationController
-  skip_before_action :authenticate_request, only: [:index, :show]
-  before_action :authorize_admin, only: [:create, :update, :destroy]
-  before_action :set_show, only: [:update, :destroy, :attend, :unattend, :favorite, :unfavorite, :rate]
+  skip_before_action :authenticate_request, only: %i[index show]
+  before_action :authorize_admin, only: %i[create update destroy]
+  # before_action :set_show, only: %i[update destroy attend unattend favorite unfavorite rate]
 
   # GET /shows
   def index
-    s = Rails.cache.fetch("shows:#{params.to_s}") do
-      if params[:search].present?
-        ids = PgSearch.multisearch(params[:search]).pluck(:searchable_id).take(100)
-        shows = Show.includes(:venue, :show_youtubes, tracks: [:annotations, :song]).merge(Track.setlist).where(id: ids).to_a
-        shows = shows.sort {|a,b| a.date <=> b.date }
-      elsif params[:last].present?
-        ids = Show.order("date desc").limit(params[:last].to_i)
-        shows = Show.includes(:venue, :show_youtubes, tracks: [:annotations, :song]).merge(Track.setlist).where(id: ids).to_a
-        shows = shows.sort {|a,b| b.date <=> a.date }
-      elsif params[:top_rated].present?
-        shows = Show.joins(:ratings).includes(:venue, :show_youtubes).group("shows.id").having("count(*) >= 5").order("shows.average_rating DESC, ratings.count DESC").take(100)
-        render json: ShowSerializer.render(shows, view: :ratings)
-        return
-      else
-        shows = base_shows
-        if params[:year].present?
-          shows = shows.by_year(params[:year].to_i)
-        end
+    if params[:search].present?
+      ids = PgSearch.multisearch(params[:search]).pluck(:searchable_id).take(100)
+      shows = Show.includes(:venue, :show_youtubes,
+                            tracks: %i[annotations song]).merge(Track.setlist).where(id: ids).to_a
+      shows = shows.sort { |a, b| a.date <=> b.date }
+    elsif params[:last].present?
+      ids = Show.order("date desc").limit(params[:last].to_i)
+      shows = Show.includes(:venue, :show_youtubes,
+                            tracks: %i[annotations song]).merge(Track.setlist).where(id: ids).to_a
+      shows = shows.sort { |a, b| b.date <=> a.date }
+    elsif params[:top_rated].present?
+      shows = Show.joins(:ratings).includes(:venue,
+                                            :show_youtubes).group("shows.id").having("count(*) >= 5").order("shows.average_rating DESC, ratings.count DESC").take(100)
+    else
+      shows = base_shows
+      shows = shows.by_year(params[:year].to_i) if params[:year].present?
 
-        if params[:venue].present?
-          venue = Venue.find(params[:venue])
-          shows = shows.where(venue_id: venue.id)
-        end
-
-        if params[:city].present? && params[:state].present?
-          shows = shows.joins(:venue).merge(Venue.city(params[:city], params[:state]))
-        elsif params[:state].present?
-          shows = shows.joins(:venue).merge(Venue.state(params[:state]))
-        end
-
-        shows = shows.sort {|a,b| a.date <=> b.date }
+      if params[:venue].present?
+        venue = Venue.find(params[:venue])
+        shows = shows.where(venue_id: venue.id)
       end
 
-      ShowSerializer.render(shows, view: :setlist)
+      if params[:city].present? && params[:state].present?
+        shows = shows.joins(:venue).merge(Venue.city(params[:city], params[:state]))
+      elsif params[:state].present?
+        shows = shows.joins(:venue).merge(Venue.state(params[:state]))
+      end
+
+      shows = shows.sort { |a, b| a.date <=> b.date }
     end
 
-    render json: s
+    @shows = shows
+    @unique_month_names = @shows.sort_by(&:date).map { |show| show.date.strftime("%B") }.uniq
   end
 
   # retrieves shows associated with current user
   def user
     show_ids = begin
       current_user.attendances.pluck(:show_id) +
-      current_user.favorites.pluck(:show_id) +
-      current_user.ratings.where(rateable_type: "Show").pluck(:rateable_id)
+        current_user.favorites.pluck(:show_id) +
+        current_user.ratings.where(rateable_type: "Show").pluck(:rateable_id)
     end.uniq
 
-    shows = base_shows.where(id: show_ids).sort {|a,b| a.date <=> b.date }
+    shows = base_shows.where(id: show_ids).sort { |a, b| a.date <=> b.date }
     render json: ShowSerializer.render(shows, view: :setlist)
   end
 
-
   # GET /shows/1
   def show
-    show = Show.includes(:venue, tracks: [:annotations, :song]).merge(Track.setlist).find(params[:id])
-    render json: ShowSerializer.render(show, view: :setlist)
+    @show = Show.includes(:venue, tracks: %i[annotations song]).merge(Track.setlist).find(params[:id])
   end
 
   # POST /shows
@@ -130,7 +124,7 @@ class ShowsController < ApplicationController
   private
 
   def base_shows
-    Show.includes(:venue, :show_youtubes, tracks: [:annotations, :song]).merge(Track.setlist)
+    Show.includes(:venue, :show_youtubes, tracks: %i[annotations song]).merge(Track.setlist)
   end
 
   def set_show
