@@ -1,13 +1,16 @@
 class User < ApplicationRecord
+  # Include default devise modules. Others available are:
+  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
+  devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable
   include Rails.application.routes.url_helpers
 
-  has_secure_password
+  # has_secure_password
   rolify
   validates :email, :username, presence: true, uniqueness: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, presence: true,
-            length: { minimum: 6 },
-            if: -> { new_record? || !password.nil? }
+                       length: { minimum: 6 },
+                       if: -> { new_record? || !password.nil? }
 
   has_one_attached :avatar, dependent: :destroy
   has_many :show_photos
@@ -25,6 +28,6 @@ class User < ApplicationRecord
   end
 
   def admin?
-    self.has_role?(:admin)
+    has_role?(:admin)
   end
 end

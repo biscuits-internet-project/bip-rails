@@ -1,1 +1,7 @@
-<h1><%= @venue.name %></h1>
+<h1><%= format_show_date(@show.date) %> - <%= @show.venue.name %> - <%= @show.venue.city %>, <%= @show.venue.state %></h1>
+
+<%= render partial: "shows/show", locals: { show: @show } %>
+
+<h3>Reviews</h3>
+
+<%= render partial: "shows/review", collection: @show.reviews, as: :review %>

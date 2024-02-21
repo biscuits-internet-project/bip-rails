@@ -1,23 +1,23 @@
 <% cache do %>
   <h1>Shows <%= "from #{params[:year]}" if params[:year] %></h1>
-  <% (1995..Time.current.year).to_a.each do |year| %>
-    <%= link_to by_year_shows_path(year: year) do %>
-      <span class="badge">
-        <%= year %>
-      </span>
+  <div class="flex justify-center items-center">
+    <% (1995..Time.current.year).to_a.each do |year| %>
+      <%= link_to by_year_shows_path(year: year) do %>
+        <span class="badge m-2">
+          <%= year %>
+        </span>
+      <% end %>
     <% end %>
-  <% end %>
-  <% @unique_month_names.each do |month| %>
-    <%= link_to "##{month.downcase}" do %>
-      <span class="badge">
-        <%= month %>
-      </span>
+  </div>
+  <div class="flex justify-center items-center">
+    <% @unique_month_names.each do |month| %>
+      <%= link_to "##{month.downcase}" do %>
+        <span class="badge m-2">
+          <%= month %>
+        </span>
+      <% end %>
     <% end %>
-  <% end %>
-  <%= form_tag(venues_path, method: :get) do %>
-    <%= text_field_tag(:search, params[:search]) %>
-    <%= render_button "Search" %>
-  <% end %>
+  </div>
   <% previous_month = nil %>
   <% @shows.each do |show| %>
     <% current_month = show.date.strftime("%B").downcase %>

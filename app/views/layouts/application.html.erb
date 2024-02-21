@@ -10,12 +10,13 @@
     <%= javascript_importmap_tags %>
   </head>
   <body class="flex flex-col h-screen">
-    <header class="bg-gray-800 text-white">
-      <!-- app/views/layouts/application.html.erb -->
-      <button data-controller="theme" data-action="click->theme#toggle">Toggle Dark/Light Mode</button>
+    <header class="">
+      <%= render 'layouts/shared/header' %>
     </header>
     <div class="flex flex-1 overflow-hidden">
-      <main class="flex-1 overflow-auto">
+      <main class="flex-1 overflow-auto m-4">
+        <p class="notice"><%= notice %></p>
+        <p class="alert"><%= alert %></p>
         <%= yield %>
       </main>
     </div>

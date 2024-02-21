@@ -7,6 +7,9 @@ gem 'pg_search'
 gem 'audited'
 gem 'friendly_id'
 gem 'blueprinter'
+gem "bcrypt", "~> 3.1.7"
+gem "rolify"
+gem "devise"
 
 # Use main development branch of Rails
 gem 'rails', github: 'rails/rails', branch: 'main'
@@ -68,6 +71,7 @@ group :development, :test do
   gem 'rubocop-rspec', require: false
   gem 'rspec-rails'
   gem 'factory_bot_rails'
+  gem 'shoulda-matchers'
 end
 
 group :development do

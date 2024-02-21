@@ -1,0 +1,10 @@
+<div class="flex">
+  <div class="w-2/3 mr-4">
+    <h1>Most Recent Shows</h1>
+    <%= render partial: "shows/show", collection: @shows, as: :show %>
+  </div>
+  <div class="w-1/3">
+    <h1>Most Recent Blog Posts</h1>
+    <%= render partial: "blog_posts/post", collection: @posts, as: :post %>
+  </div>
+</div>

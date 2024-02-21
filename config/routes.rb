@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  root to: 'health#index'
+  devise_for :users
+  root to: 'home#index'
 
   resources :blog_posts do
     put :publish, on: :member

@@ -1,2 +1,7 @@
 <h1><%= @venue.name %> - <%= @venue.city %>, <%= @venue.state %></h1>
+
+<div>Times played	<%= @venue.shows.length %></div>
+<div>First played	<%= link_to format_show_date(@venue.shows.first.date), show_path(@venue.shows.first.slug) %></div>
+<div>Last played     <%= link_to format_show_date(@venue.shows.last.date), show_path(@venue.shows.last.slug) %></div>
+
 <%= render partial: "shows/show", collection: @shows, as: :show %>

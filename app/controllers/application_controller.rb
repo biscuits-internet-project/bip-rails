@@ -1,16 +1,10 @@
 class ApplicationController < ActionController::Base
   include Pagy::Backend
   protect_from_forgery with: :exception
-  before_action :authenticate_request
   attr_reader :current_user
 
   def not_found
     render json: { error: 'not_found' }
-  end
-
-  def authenticate_request
-    @current_user = AuthorizeRequest.call(request.headers).result
-    render_not_authenticated unless @current_user
   end
 
   def authorize_admin

@@ -16,8 +16,12 @@ class ShowsController < ApplicationController
                             tracks: %i[annotations song]).merge(Track.setlist).where(id: ids).to_a
       shows = shows.sort { |a, b| b.date <=> a.date }
     elsif params[:top_rated].present?
-      shows = Show.joins(:ratings).includes(:venue,
-                                            :show_youtubes).group("shows.id").having("count(*) >= 5").order("shows.average_rating DESC, ratings.count DESC").take(100)
+      shows = Show.joins(:ratings)
+                  .includes(:venue, :show_youtubes)
+                  .group("shows.id")
+                  .having("count(*) >= 5")
+                  .order("shows.average_rating DESC, ratings.count DESC")
+                  .take(100)
     else
       shows = base_shows
       shows = shows.by_year(params[:year].to_i) if params[:year].present?
@@ -54,7 +58,7 @@ class ShowsController < ApplicationController
 
   # GET /shows/1
   def show
-    @show = Show.includes(:venue, tracks: %i[annotations song]).merge(Track.setlist).find(params[:id])
+    @show = Show.includes(:venue, reviews: :user, tracks: %i[annotations song]).merge(Track.setlist).find(params[:id])
   end
 
   # POST /shows
