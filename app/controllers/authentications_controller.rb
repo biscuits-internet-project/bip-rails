@@ -1,5 +1,5 @@
 class AuthenticationsController < ApplicationController
-  skip_before_action :authenticate_request, except: [:refresh]
+  skip_before_action :authenticate_user!, except: [:refresh]
 
   # POST /auth/login
   def login
@@ -16,7 +16,7 @@ class AuthenticationsController < ApplicationController
     token = JsonWebToken.encode(current_user)
 
     if token.present?
-      render json: { token: token }
+      render json: { token: }
     else
       render json: { error: "An error has occurred." }, status: :unauthorized
     end

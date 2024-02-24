@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable
+  devise :database_authenticatable, :registerable, :recoverable, :validatable, :rememberable, :trackable
   include Rails.application.routes.url_helpers
 
   # has_secure_password
@@ -18,6 +18,10 @@ class User < ApplicationRecord
   has_many :favorites, dependent: :destroy
   has_many :ratings, dependent: :destroy
   has_many :blog_posts
+
+  def remember_me
+    true
+  end
 
   def avatar_url
     rails_blob_url(avatar) if avatar.present?

@@ -10,6 +10,7 @@ gem 'blueprinter'
 gem "bcrypt", "~> 3.1.7"
 gem "rolify"
 gem "devise"
+gem "stamp"
 
 # Use main development branch of Rails
 gem 'rails', github: 'rails/rails', branch: 'main'

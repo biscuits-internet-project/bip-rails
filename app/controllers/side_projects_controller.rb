@@ -1,5 +1,5 @@
 class SideProjectsController < ApplicationController
-  skip_before_action :authenticate_request, only: [:index]
+  skip_before_action :authenticate_user!, only: [:index]
 
   # GET /side_projects
   def index
@@ -7,5 +7,4 @@ class SideProjectsController < ApplicationController
 
     render json: SideProjectSerializer.render(side_projects)
   end
-
 end

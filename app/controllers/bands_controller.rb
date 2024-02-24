@@ -1,5 +1,5 @@
 class BandsController < ApplicationController
-  skip_before_action :authenticate_request, only: %i[index show]
+  skip_before_action :authenticate_user!, only: %i[index show]
   before_action :authorize_admin, only: %i[create update destroy]
   before_action :set_band, only: %i[show update destroy]
 

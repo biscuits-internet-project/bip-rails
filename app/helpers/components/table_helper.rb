@@ -1,7 +1,7 @@
 module Components::TableHelper
   def render_table(caption = nil, **options, &block)
     content_tag :table, options.reverse_merge(
-      class: tw('w-full text-sm border-solid', options[:class])
+      class: tw('w-full text-md border-solid', options[:class])
     ) do
       if caption.present?
         content_tag :caption, caption, class: 'mt-4 text-sm text-muted-foreground ' do

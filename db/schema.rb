@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_06_02_015756) do
+ActiveRecord::Schema[7.2].define(version: 2024_02_22_020434) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -129,6 +129,13 @@ ActiveRecord::Schema[7.1].define(version: 2023_06_02_015756) do
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
+  create_table "faq", id: false, force: :cascade do |t|
+    t.integer "id"
+    t.text "question"
+    t.text "answer"
+    t.integer "section"
+  end
+
   create_table "favorites", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.uuid "show_id", null: false
@@ -147,6 +154,42 @@ ActiveRecord::Schema[7.1].define(version: 2023_06_02_015756) do
     t.index ["slug", "sluggable_type", "scope"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope", unique: true
     t.index ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
     t.index ["sluggable_type", "sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_type_and_sluggable_id"
+  end
+
+  create_table "galleries", id: false, force: :cascade do |t|
+    t.integer "id"
+    t.string "url", limit: 1000
+    t.string "type", limit: 20
+    t.integer "showid"
+  end
+
+  create_table "legacy_shows", id: false, force: :cascade do |t|
+    t.integer "id"
+    t.integer "band"
+    t.date "date"
+    t.integer "venue"
+    t.text "set1"
+    t.text "set2"
+    t.text "set3"
+    t.text "set4"
+    t.text "encore1"
+    t.text "encore2"
+    t.text "precomment"
+    t.text "comment1"
+    t.text "comment2"
+    t.text "comment3"
+    t.text "comment4"
+    t.text "comment5"
+    t.text "comment6"
+    t.text "comment7"
+    t.text "comment8"
+    t.text "comment9"
+    t.text "comment10"
+    t.text "sources"
+    t.text "flips"
+    t.integer "showorder"
+    t.text "reviews"
+    t.string "archiveorg", limit: 300
   end
 
   create_table "likes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -354,8 +397,15 @@ ActiveRecord::Schema[7.1].define(version: 2023_06_02_015756) do
     t.string "confirmation_token"
     t.datetime "confirmed_at", precision: nil
     t.datetime "confirmation_sent_at", precision: nil
-    t.string "password_digest", null: false
+    t.string "password_digest"
     t.string "username"
+    t.string "encrypted_password"
+    t.integer "sign_in_count", default: 0, null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.inet "current_sign_in_ip"
+    t.inet "last_sign_in_ip"
+    t.datetime "remember_created_at"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -385,6 +435,11 @@ ActiveRecord::Schema[7.1].define(version: 2023_06_02_015756) do
     t.datetime "updated_at", null: false
     t.integer "times_played", default: 0, null: false
     t.index ["slug"], name: "index_venues_on_slug"
+  end
+
+  create_table "youtubes", id: false, force: :cascade do |t|
+    t.date "date"
+    t.text "url"
   end
 
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"

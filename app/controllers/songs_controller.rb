@@ -1,5 +1,5 @@
 class SongsController < ApplicationController
-  skip_before_action :authenticate_request, only: %i[index show]
+  skip_before_action :authenticate_user!, only: %i[index show]
   before_action :authorize_admin, only: %i[create update destroy]
   before_action :set_song, only: %i[show update destroy]
   helper_method :sort_column, :sort_direction
@@ -18,7 +18,9 @@ class SongsController < ApplicationController
   # GET /songs/1
   def show
     @song.generate_history_links
+    @all_timers = @song.tracks.where(all_timer: true).includes(show: :venue).map(&:show)
     @song
+    @tracks = @song.tracks.includes(previous_track: :song, next_track: :song, show: :venue).order('shows.date asc')
   end
 
   # POST /songs

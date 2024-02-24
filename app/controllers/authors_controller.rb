@@ -1,7 +1,7 @@
 class AuthorsController < ApplicationController
-  skip_before_action :authenticate_request, only: [:index, :show]
-  before_action :authorize_admin, only: [:create, :update, :destroy]
-  before_action :set_author, only: [:show, :update, :destroy]
+  skip_before_action :authenticate_user!, only: %i[index show]
+  before_action :authorize_admin, only: %i[create update destroy]
+  before_action :set_author, only: %i[show update destroy]
 
   # GET /authors
   def index
@@ -41,11 +41,12 @@ class AuthorsController < ApplicationController
   end
 
   private
-    def set_author
-      @author = Author.find(params[:id])
-    end
 
-    def author_params
-      params.permit(:name)
-    end
+  def set_author
+    @author = Author.find(params[:id])
+  end
+
+  def author_params
+    params.permit(:name)
+  end
 end

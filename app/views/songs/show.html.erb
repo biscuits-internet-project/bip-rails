@@ -1,8 +1,138 @@
 <h1><%= @song.title %></h1>
 
-<%= @song.first_played_show %>
-<%= @song.last_played_show %>
-<%= @song.history %>
-<%= @song.shows_since_last_played %>
-<%= @song.most_common_year %>
-<%= @song.least_common_year %>
+<table>
+  <tr>
+    <td>Author</td>
+    <td><%= @song.author.name %></td>
+  </tr>
+  <tr>
+    <td>Times played</td>
+    <td><%= @song.times_played %></td>
+  </tr>
+  <tr>
+    <td>Debut</td>
+    <td><%= render partial: "shows/show_link", locals: { show: @song.first_played_show } %></td>
+  </tr>
+  <tr>
+    <td>Last played</td>
+    <td><%= render partial: "shows/show_link", locals: { show: @song.last_played_show } %></td>
+  </tr>
+  <tr>
+    <td>Most Common Year</td>
+    <td><%= @song.most_common_year %></td>
+  </tr>
+  <tr>
+    <td>Least Common Year</td>
+    <td><%= @song.least_common_year %></td>
+  </tr>
+  <tr>
+    <td>Shows Since Last Played</td>
+    <td><%= @song.shows_since_last_played %></td>
+  </tr>
+  <tr>
+    <td>All timers</td>
+    <td>
+      <% @all_timers.each do |all_timer| %>
+        <%= render partial: "shows/show_link", locals: { show: all_timer } %><br>
+      <% end %>
+    </td>
+  </tr>
+  <% if @song.guitar_tabs_url %>
+    <tr>
+      <td>Guitar tabs</td>
+      <td><%= link_to "Sick Barber Licks", @song.guitar_tabs_url, target: :blank %></td>
+    </tr>
+  <% end %>
+
+</table>
+
+<%= render_accordion title: "Lyrics" do %>
+  <%= accordion_description do %>
+    <%= @song.lyrics.html_safe %>
+  <% end %>
+<% end if @song.lyrics.present? %>
+
+<%= render_accordion title: "History" do %>
+  <%= accordion_description do %>
+    <%= @song.history.html_safe %>
+  <% end %>
+<% end if @song.history.present? %>
+
+<hr>
+
+<h2>Every time played</h2>
+
+<%= render_table do %>
+  <%= table_head do %>
+    <%= table_header "Show" %>
+    <%= table_header "Gap" %>
+    <%= table_header "Song Before" %>
+    <%= table_header "Song After" %>
+    <%= table_header "Notes" %>
+    <%= table_header "Rating" %>
+  <% end %>
+
+  <%= table_body do %>
+    <% @tracks.each do |track|  %>
+      <% prev_song = track.previous_track&.song %>
+      <% next_song = track.next_track&.song %>
+      <%= table_row do %>
+        <%= table_column class: "whitespace-nowrap" do %>
+          <%= link_to show_path(track.show.slug) do %>
+            <%= format_show_date(track.show.date) %><br>
+            <%= track.show.venue.name %><br>
+            <%= track.show.venue.city %>, <%= track.show.venue.state %>
+          <% end %>
+        <% end %>
+        <%= table_column do %>
+        <% end %>
+        <%= table_column class: "whitespace-nowrap" do %>
+          <%= link_to prev_song.title, song_path(prev_song.slug) if prev_song %> <%= track.previous_track.segue if track.previous_track %>
+        <% end %>
+        <%= table_column class: "whitespace-nowrap" do %>
+          <%= track.segue %> <%= link_to next_song.title, song_path(next_song.slug) if next_song %>
+        <% end %>
+        <%= table_column do %>
+          <%= track.note %>
+        <% end %>
+        <%= table_column do %>
+          <%= track.average_rating.round(2) unless track.average_rating == 0 %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<div class="block md:hidden">
+  <!-- Cards for mobile view -->
+  <div class="p-4 bg-white shadow-md rounded-lg mb-4">
+    <div class="font-bold">Header 1</div>
+    <div>Data 1</div>
+  </div>
+  <div class="p-4 bg-white shadow-md rounded-lg mb-4">
+    <div class="font-bold">Header 2</div>
+    <div>Data 2</div>
+  </div>
+  <!-- Add more cards as needed -->
+</div>
+
+<div class="hidden md:block">
+  <!-- Table for desktop view -->
+  <table class="min-w-full">
+    <thead>
+      <tr>
+        <th class="border px-4 py-2">Header 1</th>
+        <th class="border px-4 py-2">Header 2</th>
+        <!-- Add more headers as needed -->
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="border px-4 py-2">Data 1</td>
+        <td class="border px-4 py-2">Data 2</td>
+        <!-- Add more data cells as needed -->
+      </tr>
+      <!-- Add more rows as needed -->
+    </tbody>
+  </table>
+</div>

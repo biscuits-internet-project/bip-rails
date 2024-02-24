@@ -30,7 +30,7 @@ class Song < ApplicationRecord
   end
 
   def last_played_show
-    shows.order('date asc').last
+    shows.includes(:venue).order('date asc').last
   end
 
   def shows_since_last_played
@@ -38,7 +38,7 @@ class Song < ApplicationRecord
   end
 
   def first_played_show
-    shows.order('date asc').first
+    shows.includes(:venue).order('date asc').first
   end
 
   def update_times_played
@@ -93,8 +93,8 @@ class Song < ApplicationRecord
   # returns an array of [year, times_played] for the year with the lowest non-zero # of occurrences
   def calculate_least_common_year
     calculate_plays_by_year.select do |year, times_played|
-      times_played > 0
-    end.sort_by { |year, times_played| times_played }.first
+      times_played.positive?
+    end.min_by { |year, times_played| times_played }
   end
 
   # returns a hash of the top N longest gaps, keyed by # of shows since previous occurence
@@ -128,13 +128,18 @@ class Song < ApplicationRecord
 
     replacements = {}
 
-    history.scan(%r{\d{1,2}/\d{1,2}/\d{2,4}}) do |match|
-      date = Date.strptime(match, '%m/%d/%Y')
-      show = Show.where(date: date.stamp('2001-01-30')).first
-      if show.present?
-        link = "<a href='/shows/#{show.slug}'>#{match}</a>"
-        replacements[match] = link
-      end
+    cutoff_year = 50
+
+    history.gsub!(%r{\b(\d{1,2})/(\d{1,2})/(\d{2,4})\b}) do |match|
+      month, day, year = match.split('/')
+      year = if year.length == 2
+               year.to_i < cutoff_year ? "20#{year}" : "19#{year}"
+             else
+               year
+             end
+      formatted_date = "#{year}-#{month.rjust(2, '0')}-#{day.rjust(2, '0')}"
+      show = Show.find_by(date: formatted_date)
+      "<a href='#{show.slug}'>#{match}</a>"
     end
 
     replacements.each do |k, v|

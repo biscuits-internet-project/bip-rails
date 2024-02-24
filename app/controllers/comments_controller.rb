@@ -1,6 +1,6 @@
 class CommentsController < ApplicationController
-  skip_before_action :authenticate_request, only: [:index]
-  before_action :set_comment, only: [:update, :destroy]
+  skip_before_action :authenticate_user!, only: [:index]
+  before_action :set_comment, only: %i[update destroy]
 
   def index
     comments = BlogPost.find(params[:blog_post_id]).comments.all

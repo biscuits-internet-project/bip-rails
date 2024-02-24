@@ -1,18 +1,18 @@
 class TracksController < ApplicationController
-  skip_before_action :authenticate_request, only: [:index, :show, :charts]
-  before_action :authorize_admin, only: [:update, :create, :destroy]
-  before_action :set_track, only: [:show, :update, :destroy]
+  skip_before_action :authenticate_user!, only: %i[index show charts]
+  before_action :authorize_admin, only: %i[update create destroy]
+  before_action :set_track, only: %i[show update destroy]
 
   # GET /tracks/song/:id
   def index
     song = Song.find(params["song_id"])
 
     tracks = Rails.cache.fetch("song:#{song.slug}:tracks") do
-      tracks = Track.includes(:tags, :annotations, :venue, show: [:venue, :show_youtubes], previous_track: [:annotations], next_track: [:annotations]) # currently excluded from serializer: :track_tag_taggings, :track_tags,
+      tracks = Track.includes(:tags, :annotations, :venue, show: %i[venue show_youtubes], previous_track: [:annotations], next_track: [:annotations]) # currently excluded from serializer: :track_tag_taggings, :track_tags,
                     .joins(:show)
                     .where(song_id: song.id)
                     .order('shows.date').to_a
-                    # .select('tracks.*, shows.date, shows.date - lag(shows.date, 1) OVER (ORDER BY shows.date) as days_since_previous_occurrence')
+      # .select('tracks.*, shows.date, shows.date - lag(shows.date, 1) OVER (ORDER BY shows.date) as days_since_previous_occurrence')
       TrackSerializer.render(tracks, view: :versions)
     end
 
@@ -20,7 +20,7 @@ class TracksController < ApplicationController
   end
 
   def charts
-    tracks = Track.includes(:tags, :annotations, [song: :author], show: [:venue, :show_youtubes]).where("COALESCE(note, '') != ''").order('shows.date').to_a
+    tracks = Track.includes(:tags, :annotations, [song: :author], show: %i[venue show_youtubes]).where("COALESCE(note, '') != ''").order('shows.date').to_a
 
     render json: TrackSerializer.render(tracks, view: :charts)
   end
@@ -33,7 +33,7 @@ class TracksController < ApplicationController
   # POST /tracks
   def create
     show = Show.find(params[:show_id])
-    track = Track.new(track_params.merge(show: show))
+    track = Track.new(track_params.merge(show:))
 
     if track.save
       track.save_annotations(params[:annotations])

@@ -1,13 +1,11 @@
 class ReviewsController < ApplicationController
-  skip_before_action :authenticate_request, only: [:index]
-  before_action :set_review, only: [:show, :update, :destroy]
+  skip_before_action :authenticate_user!, only: [:index]
+  before_action :set_review, only: %i[show update destroy]
 
   def index
     reviews = Review.joins(:user).all
 
-    if params[:show_id]
-      reviews = reviews.where(show_id: params[:show_id])
-    end
+    reviews = reviews.where(show_id: params[:show_id]) if params[:show_id]
 
     render json: ReviewSerializer.render(reviews)
   end
@@ -15,7 +13,7 @@ class ReviewsController < ApplicationController
   # POST /:shows/:show_id/reviews
   def create
     show = Show.find(params[:show_id])
-    review = Review.create(show: show, user: current_user, content: params[:content])
+    review = Review.create(show:, user: current_user, content: params[:content])
 
     if review.errors.blank?
       render json: ReviewSerializer.render(review), status: 201

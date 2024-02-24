@@ -1,10 +1,10 @@
 class ContactController < ApplicationController
-  skip_before_action :authenticate_request
+  skip_before_action :authenticate_user!
 
-  # POST /contact 
+  # POST /contact
   def create
     command = ContactSend.call(params)
-  
+
     if command.success?
       render json: {}, status: :ok
     else

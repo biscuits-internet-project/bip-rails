@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-  skip_before_action :authenticate_request, only: %i[index]
+  skip_before_action :authenticate_user!, only: %i[index]
 
   def index
     @shows = Show.includes(:venue, reviews: :user, tracks: %i[annotations song]).merge(Track.setlist).order(date: :desc).limit(10)

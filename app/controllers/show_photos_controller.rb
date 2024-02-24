@@ -1,5 +1,5 @@
 class ShowPhotosController < ApplicationController
-  skip_before_action :authenticate_request, only: [:index]
+  skip_before_action :authenticate_user!, only: [:index]
 
   # GET /shows/:id/:photos
   def index
@@ -8,5 +8,4 @@ class ShowPhotosController < ApplicationController
 
     render json: ShowPhotoSerializer.render(photos)
   end
-
 end

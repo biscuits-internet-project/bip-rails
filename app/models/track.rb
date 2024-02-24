@@ -52,9 +52,7 @@ class Track < ApplicationRecord
   end
 
   def update_show_previous_and_next_tracks
-    show.tracks.each do |track|
-      track.update_previous_and_next_tracks
-    end
+    show.tracks.each(&:update_previous_and_next_tracks)
   end
 
   def update_previous_and_next_tracks
